@@ -18,7 +18,7 @@ export default function LandingPage(){
     const [district, setDistrict]
         = useState('');
     const [vehicleType, setVehicleType]
-        = useState('privateCar');
+        = useState('');
     const getLandingData = async ()=>{
         setLandingData(await PackingVacancyApi.getLandingData(vehicleType))
     }
@@ -35,9 +35,16 @@ export default function LandingPage(){
         setVehicleType(event.target.value);
     };
 
+    const filterDataByDistrict = (landingData:CombinedData|undefined, district:string) => {
+        return landingData.results.filter((result) => {
+            return result.displayAddress.toLowerCase().includes(district.toLowerCase());
+        });
+    };
+
     const handleSubmit = (event) => {
-        // event.preventDefault();
+        event.preventDefault();
         getLandingData();
+        return filterDataByDistrict(landingData, event.target.element.district.value)
     };
     return(
         <>

@@ -1,19 +1,15 @@
 import Table from "react-bootstrap/esm/Table";
 import {CarparkDos} from "../../domain/CarparkDos.ts";
 import PackingVacancyTableRow from "./PackingVacancyTableRow.tsx";
-import {CombinedData} from "../../domain/CombinedData.ts";
+import {CombinedData, Result} from "../../domain/CombinedData.ts";
 
 type Props = {
-    landingData: CombinedData
+    landingDataResult: Result[]
     vehicleType: string
     district: string
 }
-export default function PackingVacancyTable({landingData, vehicleType, district}:Props){
-    const filteredData = landingData.results.filter((result)=>{
-       return (
-           result.displayAddress.toLowerCase().includes(district.toLowerCase())
-       );
-    });
+export default function PackingVacancyTable({landingDataResult, vehicleType, district}:Props){
+
     return(
         <>
             <Table striped bordered hover>
@@ -28,7 +24,7 @@ export default function PackingVacancyTable({landingData, vehicleType, district}
                 </thead>
                 <tbody>
                     {
-                        filteredData.map((result)=>(
+                        landingDataResult.map((result)=>(
                             <PackingVacancyTableRow result={result} vehicleType={vehicleType} key={result.park_Id}/>
                         ))
                     }
