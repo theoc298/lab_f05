@@ -1,0 +1,80 @@
+import {Container} from "react-bootstrap";
+import PackingVacancyTable from "../../component/PackingVacancyTable.tsx";
+import {useEffect, useState} from "react";
+import TableLoadingSpinner from "../../component/TableLoadingSpinner0.tsx";
+import * as PackingVacancyApi from "../../../api/PackingVacancyApi.ts"
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import "./LandingPage.css"
+import {CombinedData} from "../../../domain/CombinedData.ts";
+
+export default function LandingPage(){
+    const [landingData, setLandingData]
+        = useState<CombinedData|undefined>(undefined);
+    const [district, setDistrict]
+        = useState('');
+    const [vehicleType, setVehicleType]
+        = useState('');
+    const getLandingData = async ()=>{
+        setLandingData(await PackingVacancyApi.getLandingData(vehicleType))
+    }
+
+    useEffect(()=>{
+        getLandingData();
+    },[])
+
+    const handleDistrictChange = (event) => {
+        setDistrict(event.target.value);
+    };
+
+    const handleVehicleTypeChange = (event) => {
+        setVehicleType(event.target.value);
+    };
+
+    const filterDataByDistrict = (landingData:CombinedData, district:string) => {
+        return landingData.results.filter((result) => {
+            return result.displayAddress.toLowerCase().includes(district.toLowerCase());
+        });
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        getLandingData();
+    };
+
+    return(
+        <>
+            <Container>
+                <h2 className="Header" style={{display:"flex", margin:"10px 10px", backgroundColor:""}}>
+                    Packing Vacancy
+                </h2>
+                <Form className="form" onSubmit={handleSubmit}>
+                    <Form.Group className="mb-3"
+                                >
+                        <Form.Label style={{marginRight: "100px"}}>District</Form.Label>
+                        <Form.Control placeholder="e.g. Kwun Tong" value={district} onChange={handleDistrictChange}/>
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label style={{marginRight: "60px", whiteSpace: "nowrap"}}>Vehicle Type</Form.Label>
+                        <Form.Select value={vehicleType} onChange={handleVehicleTypeChange}>
+                            <option value="privateCar">Private Car</option>
+                            <option value="LGV">LGV</option>
+                            <option value="HGV">HGV</option>
+                            <option value="Coach">Coach</option>
+                            <option value="Motorcycle">Motorcycle</option>
+                        </Form.Select>
+                    </Form.Group>
+                    <Button variant="primary" type="submit" style={{display: "flex", marginLeft: "10px", marginBottom:"20px"}}>
+                        Search
+                    </Button>
+                </Form>
+                <br/>
+                {
+                    landingData ?
+                        <PackingVacancyTable landingDataResult={filterDataByDistrict(landingData, district)} vehicleType={vehicleType} district={district}/>:
+                        <TableLoadingSpinner/>
+                }
+            </Container>
+        </>
+    )
+}
